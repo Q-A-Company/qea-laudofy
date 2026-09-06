@@ -41,3 +41,29 @@ export async function createUser(input: {
     throw new Error(body.error ?? "Falha ao criar usuário");
   }
 }
+
+export async function updateUser(
+  id: string,
+  input: { name: string; email: string; role: "admin" | "corretor" },
+): Promise<void> {
+  const res = await fetch(`${API_URL}/admin/users/${id}`, {
+    method: "PATCH",
+    headers: await authHeaders(),
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? "Falha ao editar usuário");
+  }
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/admin/users/${id}`, {
+    method: "DELETE",
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? "Falha ao excluir usuário");
+  }
+}

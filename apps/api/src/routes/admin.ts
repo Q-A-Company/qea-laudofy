@@ -15,6 +15,12 @@ type CreateUserBody = {
   role?: "admin" | "corretor";
 };
 
+type UpdateUserBody = {
+  name: string;
+  email: string;
+  role?: "admin" | "corretor";
+};
+
 export async function adminRoutes(app: FastifyInstance) {
   app.get(
     "/admin/users",
@@ -58,6 +64,68 @@ export async function adminRoutes(app: FastifyInstance) {
       }
 
       return reply.send({ id: created.user.id, email: created.user.email, role: role ?? "corretor" });
+    },
+  );
+
+  app.patch<{ Params: { id: string }; Body: UpdateUserBody }>(
+    "/admin/users/:id",
+    { preHandler: [requireAuth, requireAdmin] },
+    async (req, reply) => {
+      const { id } = req.params;
+      const { name, email, role } = req.body;
+      if (!name || !email) {
+        return reply.code(400).send({ error: "Nome e e-mail são obrigatórios" });
+      }
+
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+        email,
+        user_metadata: { name },
+      });
+      if (authError) {
+        return reply.code(400).send({ error: authError.message });
+      }
+
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({ name, email, role: role ?? "corretor" })
+        .eq("id", id);
+      if (profileError) {
+        return reply.code(500).send({ error: profileError.message });
+      }
+
+      return reply.send({ id, name, email, role: role ?? "corretor" });
+    },
+  );
+
+  app.delete<{ Params: { id: string } }>(
+    "/admin/users/:id",
+    { preHandler: [requireAuth, requireAdmin] },
+    async (req: AuthedRequest & { params: { id: string } }, reply) => {
+      const { id } = req.params;
+
+      if (id === req.userId) {
+        return reply.code(400).send({ error: "Você não pode excluir sua própria conta" });
+      }
+
+      const { count, error: countError } = await supabaseAdmin
+        .from("properties")
+        .select("id", { count: "exact", head: true })
+        .eq("broker_id", id);
+      if (countError) {
+        return reply.code(500).send({ error: countError.message });
+      }
+      if (count && count > 0) {
+        return reply.code(400).send({
+          error: `Esse corretor tem ${count} imóvel(is) cadastrado(s). Exclua ou reatribua os imóveis antes de remover o usuário.`,
+        });
+      }
+
+      const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+      if (error) {
+        return reply.code(400).send({ error: error.message });
+      }
+
+      return reply.send({ deleted: true });
     },
   );
 }

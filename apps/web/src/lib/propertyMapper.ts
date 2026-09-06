@@ -79,6 +79,7 @@ export function mapFormToPropertyInsert(
     caracteristicas_imovel: values.caracteristicasImovel,
     caracteristicas_condominio: values.caracteristicasCondominio,
 
+    descricao_titulo: nullIfUndefined(values.descricaoTitulo),
     descricao: nullIfUndefined(values.descricao),
   };
 }

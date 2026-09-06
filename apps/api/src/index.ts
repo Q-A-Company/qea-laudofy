@@ -4,7 +4,6 @@ import Fastify from "fastify";
 import { classifyPhotoJob } from "./jobs/classifyPhoto.js";
 import { boss, QUEUE_CLASSIFY_PHOTO } from "./lib/queue.js";
 import { adminRoutes } from "./routes/admin.js";
-import { marketingRoutes } from "./routes/marketing.js";
 import { photoRoutes } from "./routes/photos.js";
 import { reportRoutes } from "./routes/reports.js";
 
@@ -30,7 +29,6 @@ app.get("/health", async () => ({ status: "ok" }));
 await app.register(photoRoutes);
 await app.register(reportRoutes);
 await app.register(adminRoutes);
-await app.register(marketingRoutes);
 
 await boss.start();
 await boss.createQueue(QUEUE_CLASSIFY_PHOTO);

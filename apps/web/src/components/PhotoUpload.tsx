@@ -1,3 +1,4 @@
+import { ImagePlus } from "lucide-react";
 import { useRef, useState } from "react";
 import { uploadPropertyPhotos } from "../lib/uploadPhotos";
 
@@ -47,16 +48,15 @@ export function PhotoUpload({
           handleFiles(e.dataTransfer.files);
         }}
         onClick={() => inputRef.current?.click()}
-        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
-          dragOver ? "border-slate-500 bg-slate-100" : "border-slate-300 bg-white"
+        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10 text-center transition-colors ${
+          dragOver
+            ? "border-accent-500 bg-accent-500/[0.06]"
+            : "border-border hover:border-border-strong hover:bg-surface-raised"
         }`}
       >
-        <p className="text-sm font-medium text-slate-700">
-          Arraste as fotos aqui ou clique para selecionar
-        </p>
-        <p className="mt-1 text-xs text-slate-400">
-          Pode selecionar todas de uma vez
-        </p>
+        <ImagePlus className="size-6 text-text-faint" strokeWidth={1.5} />
+        <p className="text-sm font-medium text-text">Arraste as fotos aqui ou clique para selecionar</p>
+        <p className="text-xs text-text-faint">Pode selecionar todas de uma vez</p>
         <input
           ref={inputRef}
           type="file"
@@ -69,19 +69,19 @@ export function PhotoUpload({
 
       {progress && (
         <div className="mt-3">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
             <div
-              className="h-full bg-slate-900 transition-all"
+              className="h-full rounded-full bg-accent-500 transition-all"
               style={{ width: `${(progress.uploaded / progress.total) * 100}%` }}
             />
           </div>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1.5 text-xs text-text-muted">
             Enviando {progress.uploaded} de {progress.total}...
           </p>
         </div>
       )}
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
     </div>
   );
 }

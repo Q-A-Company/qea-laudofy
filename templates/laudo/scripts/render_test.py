@@ -8,6 +8,8 @@ from pathlib import Path
 
 from docxtpl import DocxTemplate, RichText
 
+from render_report import build_descricao_richtext
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 TEMPLATE = SCRIPT_DIR.parent / "ficha_imovel.template.docx"
 OUT = SCRIPT_DIR.parent / "exemplo_renderizado.docx"
@@ -131,9 +133,12 @@ for key, val in [
 ]:
     ctx[f"chk_{key}_sim"], ctx[f"chk_{key}_nao"] = sim_nao(val)
 
-ctx["descricao"] = (
+ctx["descricao"] = build_descricao_richtext(
     "Excelente apartamento duplex com vista mar, totalmente reformado, "
-    "próximo a comércio e transporte público."
+    "à venda no condomínio Águas Claras na Barra da Tijuca com segurança 24 horas.",
+    "1º Pavimento: Sala em três ambientes com vista mar, cozinha planejada e lavabo.\n"
+    "2º Pavimento: Duas suítes, sendo a master com closet e banheira de hidromassagem.\n"
+    "Área de lazer: Piscina, área gourmet com churrasqueira e academia.",
 )
 
 tpl = DocxTemplate(str(TEMPLATE))

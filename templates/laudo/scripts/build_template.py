@@ -312,9 +312,11 @@ def main():
         t.text = replaced
         t.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
 
+        # RichText: título em negrito/maiúsculo + frase fixa em itálico +
+        # corpo com rótulos em negrito automático (ver render_report.py).
         p18_runs = paras[18].findall(q("r"))
         last_t18 = p18_runs[-1].find(q("t"))
-        last_t18.text = (last_t18.text or "") + "{{ descricao }}"
+        last_t18.text = (last_t18.text or "") + "{{r descricao}}"
         last_t18.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
 
         tree.write(str(doc_path), xml_declaration=True, encoding="UTF-8", standalone=True)

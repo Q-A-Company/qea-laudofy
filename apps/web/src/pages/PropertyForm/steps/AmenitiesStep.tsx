@@ -10,7 +10,7 @@ export function AmenitiesStep() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-900">
+        <h3 className="mb-2 text-sm font-semibold text-text">
           Características do imóvel
         </h3>
         <div className="grid grid-cols-2 gap-2">
@@ -26,7 +26,7 @@ export function AmenitiesStep() {
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-900">
+        <h3 className="mb-2 text-sm font-semibold text-text">
           Características do condomínio
         </h3>
         <div className="grid grid-cols-2 gap-2">

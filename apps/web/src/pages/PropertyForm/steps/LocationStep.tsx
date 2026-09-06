@@ -129,13 +129,13 @@ export function LocationStep() {
       <div>
         <TextField name="cep" label="CEP" placeholder="22640-100" />
         {cepStatus === "buscando" && (
-          <p className="mt-1 text-xs text-slate-400">Buscando endereço...</p>
+          <p className="mt-1 text-xs text-text-faint">Buscando endereço...</p>
         )}
         {cepStatus === "nao_encontrado" && (
-          <p className="mt-1 text-xs text-amber-600">CEP não encontrado.</p>
+          <p className="mt-1 text-xs text-warning">CEP não encontrado.</p>
         )}
         {cepStatus === "erro" && (
-          <p className="mt-1 text-xs text-amber-600">
+          <p className="mt-1 text-xs text-warning">
             Não foi possível consultar o CEP agora. Preencha manualmente.
           </p>
         )}

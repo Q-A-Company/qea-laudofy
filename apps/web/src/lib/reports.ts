@@ -34,3 +34,14 @@ export async function listReports(propertyId: string): Promise<ReportSummary[]> 
   if (!res.ok) throw new Error("Falha ao carregar laudos gerados");
   return res.json();
 }
+
+export async function deleteReport(reportId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/reports/${reportId}`, {
+    method: "DELETE",
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? "Falha ao excluir o laudo");
+  }
+}

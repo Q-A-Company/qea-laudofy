@@ -1,4 +1,7 @@
-# QEA Laudofy
+# Q&A Laudofy
+
+> Nome interno do repositório/pacotes (`qea-laudofy`) mantido por conveniência
+> técnica — o nome do produto é **Q&A Laudofy** (a marca é "Q&A", não "QEA").
 
 Sistema interno da imobiliária para os corretores (~15) cadastrarem imóveis,
 gerarem o laudo (Ficha de Imóvel) automaticamente a partir de um template
@@ -42,9 +45,14 @@ organizações é implementada agora.
 - Laudo gerado sempre a partir do `.docx` (fonte da verdade); o corretor
   escolhe baixar em DOCX ou PDF.
 - Dados factuais do laudo (endereço, metragem, valores etc.) vêm só do
-  formulário — nunca de IA generativa. IA generativa é opcional e isolada,
-  usada só para gerar uma descrição de marketing (`descricao_marketing_ia`),
-  nunca nos campos técnicos.
+  formulário, nunca de IA generativa. A descrição de marketing por IA
+  (`descricao_marketing_ia`) foi removida a pedido da equipe — a descrição
+  do laudo segue o modelo real deles: `descricao_titulo` (frase em
+  negrito/maiúsculo) + a frase fixa "O imóvel vem descrito da seguinte
+  forma:" (fixa, não é um campo) + `descricao` (corpo, onde qualquer linha
+  "Rótulo:" vira negrito automático no laudo gerado). O aviso de direitos
+  autorais que aparece no site deles é gerado pelo site, não pelo laudo —
+  nunca reproduzido aqui.
 - Tipo de imóvel: seleção única entre `apartamento/casa/cobertura/sitio/
   terreno`, EXCETO quando é `comercial/loja/sala`, caso em que pode combinar
   mais de um desses três (regra aplicada via `CHECK` constraint no banco).
@@ -248,23 +256,38 @@ só o PDF fica indisponível.
       LibreOffice, mas o build da imagem também não foi testado (sem Docker
       disponível no ambiente de desenvolvimento).
 - [x] Cadastro de corretores pelo admin — tela `/admin/users` (só visível pra
-      quem é admin), cria o usuário no Supabase Auth via Admin API
-      (`POST /admin/users` no backend, exige a service role key).
-- [x] Descrição de marketing por IA — botão isolado na página do imóvel,
-      gera a partir só de tipo/cômodos/comodidades (nunca endereço, valor ou
-      dados do proprietário); mock hoje, `ClaudeTextProvider` escrito mas não
-      testado (mesma troca via `ANTHROPIC_API_KEY`).
+      quem é admin), cria/edita/exclui o usuário via Admin API do Supabase
+      Auth (`/admin/users` no backend, exige a service role key). Exclusão
+      bloqueada com erro claro se o corretor ainda tiver imóveis (evita
+      deixar imóvel órfão — precisa excluir/reatribuir os imóveis antes).
+- [x] ~~Descrição de marketing por IA~~ — removida a pedido da equipe (ver
+      "Decisões de escopo" acima). A descrição do laudo agora é sempre
+      digitada pelo corretor, no formato real deles (título + rótulos em
+      negrito automático).
+- [x] Excluir laudo gerado — `DELETE /reports/:id` (remove do banco e do
+      storage), com confirmação inline na UI antes de excluir.
+- [x] Excluir imóvel inteiro — na página do imóvel, com confirmação inline;
+      limpa fotos/laudos do storage antes de excluir a linha (o resto —
+      property_photos, photo_upload_batches, reports — cai em cascata via FK).
+- [x] Status do imóvel virou o fluxo de trabalho real pedido pela equipe:
+      `pendente` → `finalizado` → `publicado` (substituiu o enum anterior
+      rascunho/ativo/inativo/vendido/alugado, que nunca tinha sido exposto na
+      UI). Editável na página do imóvel; filtros por status no Dashboard.
 - [ ] Heurística de agrupamento por timestamp/sequência (hoje o agrupamento é
       só por categoria; ligar fotos da "mesma suíte" ainda é manual via dropdown)
 - [x] Chave da Anthropic configurada e testada de verdade — classificação de
-      fotos e descrição de marketing agora usam a Claude real (não mais mock)
+      fotos por IA usa a Claude real (não mais mock)
 - [~] Deploy — **frontend em produção na Vercel**:
       https://web-omega-drab-89.vercel.app (deploy via `vercel deploy --prod`
       a partir da raiz do monorepo, com `vercel.json` configurando
-      install/build/output pra resolver os workspaces). **Backend na Railway
+      install/build/output pra resolver os workspaces — a equipe assume o
+      deploy manual na Vercel daqui pra frente, conectado ao GitHub). Domínio
+      próprio planejado: `laudofy.qeacompany.com.br`. **Backend na Railway
       bloqueado**: o trial da conta expirou, precisa escolher um plano pago
       no painel da Railway antes de eu conseguir rodar `railway up`. Até lá,
       o frontend publicado funciona só pra login/cadastro/fotos (que falam
       direto com o Supabase) — geração de laudo, classificação por IA e
       cadastro de corretor (que passam pelo backend) não funcionam no site
       publicado ainda, só localmente.
+- Repositório movido para a conta corporativa:
+      https://github.com/Q-A-Company/qea-laudofy

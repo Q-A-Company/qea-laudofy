@@ -187,7 +187,11 @@ export function buildReportContext(property: Property): Record<string, string> {
     ctx[`chk_${field}_nao`] = nao;
   }
 
-  ctx.descricao = fmtText(property.descricao);
+  // Chaves consumidas pelo render_report.py (Python) pra montar o RichText
+  // do campo "Descrição" (título em negrito/maiúsculo + frase fixa + corpo
+  // com rótulos em negrito automático) - não viram {{ }} simples no template.
+  ctx.descricao_titulo = fmtText(property.descricao_titulo);
+  ctx.descricao_corpo = fmtText(property.descricao);
 
   return ctx;
 }

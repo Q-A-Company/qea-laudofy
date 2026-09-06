@@ -164,7 +164,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_entrega_tipo_enum"]
             | null
           descricao: string | null
-          descricao_marketing_ia: string | null
+          descricao_titulo: string | null
           edificio: string | null
           elevadores: number | null
           endereco: string | null
@@ -234,7 +234,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_entrega_tipo_enum"]
             | null
           descricao?: string | null
-          descricao_marketing_ia?: string | null
+          descricao_titulo?: string | null
           edificio?: string | null
           elevadores?: number | null
           endereco?: string | null
@@ -304,7 +304,7 @@ export type Database = {
             | Database["public"]["Enums"]["data_entrega_tipo_enum"]
             | null
           descricao?: string | null
-          descricao_marketing_ia?: string | null
+          descricao_titulo?: string | null
           edificio?: string | null
           elevadores?: number | null
           endereco?: string | null
@@ -518,7 +518,7 @@ export type Database = {
         | "processando"
         | "concluido"
         | "erro"
-      property_status: "rascunho" | "ativo" | "inativo" | "vendido" | "alugado"
+      property_status: "pendente" | "finalizado" | "publicado"
       review_status_enum: "pendente" | "aceito" | "editado" | "rejeitado"
       sol_enum: "manha" | "tarde"
       tipo_imovel_enum:
@@ -672,7 +672,7 @@ export const Constants = {
         "concluido",
         "erro",
       ],
-      property_status: ["rascunho", "ativo", "inativo", "vendido", "alugado"],
+      property_status: ["pendente", "finalizado", "publicado"],
       review_status_enum: ["pendente", "aceito", "editado", "rejeitado"],
       sol_enum: ["manha", "tarde"],
       tipo_imovel_enum: [

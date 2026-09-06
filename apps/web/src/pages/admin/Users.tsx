@@ -1,6 +1,17 @@
+import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { createUser, listUsers, type AdminUser } from "../../lib/adminUsers";
+import { AppShell } from "../../components/AppShell";
+import { Badge, Button, Card, PageHeader } from "../../components/ui";
+import {
+  createUser,
+  deleteUser,
+  listUsers,
+  updateUser,
+  type AdminUser,
+} from "../../lib/adminUsers";
+
+const fieldClass =
+  "rounded-lg border border-border bg-bg-inset px-3 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-text-faint focus:border-accent-500";
 
 export function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -12,6 +23,11 @@ export function AdminUsers() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "corretor">("corretor");
   const [creating, setCreating] = useState(false);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   async function refresh() {
     setLoading(true);
@@ -46,28 +62,34 @@ export function AdminUsers() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
-        <h1 className="text-lg font-semibold text-slate-900">Corretores</h1>
-        <Link to="/dashboard" className="text-sm text-slate-600 hover:underline">
-          Voltar
-        </Link>
-      </header>
+  async function handleDelete(id: string) {
+    setBusyId(id);
+    setRowError(null);
+    try {
+      await deleteUser(id);
+      setConfirmingId(null);
+      await refresh();
+    } catch (err) {
+      setRowError(err instanceof Error ? err.message : "Falha ao excluir usuário");
+    } finally {
+      setBusyId(null);
+    }
+  }
 
-      <main className="mx-auto max-w-2xl px-6 py-10">
-        <form
-          onSubmit={handleCreate}
-          className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-        >
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">Novo usuário</h2>
-          <div className="flex flex-col gap-3">
+  return (
+    <AppShell>
+      <PageHeader title="Corretores" description="Gerencie as contas de corretores e administradores." />
+
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <Card className="h-fit p-5">
+          <h2 className="mb-4 text-sm font-semibold text-text">Novo usuário</h2>
+          <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <input
               required
               placeholder="Nome"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={fieldClass}
             />
             <input
               required
@@ -75,7 +97,7 @@ export function AdminUsers() {
               placeholder="E-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={fieldClass}
             />
             <input
               required
@@ -83,53 +105,164 @@ export function AdminUsers() {
               placeholder="Senha provisória"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={fieldClass}
             />
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as "admin" | "corretor")}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={fieldClass}
             >
               <option value="corretor">Corretor</option>
               <option value="admin">Administrador</option>
             </select>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={creating}
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            >
-              {creating ? "Criando..." : "Criar usuário"}
-            </button>
-          </div>
-        </form>
+            <Button type="submit" loading={creating} className="mt-1">
+              {!creating && "Criar usuário"}
+            </Button>
+          </form>
+        </Card>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-slate-900">Usuários cadastrados</h2>
+        <Card className="p-5">
+          <h2 className="mb-4 text-sm font-semibold text-text">Usuários cadastrados</h2>
+          {rowError && <p className="mb-3 text-sm text-danger">{rowError}</p>}
           {loading ? (
-            <p className="text-sm text-slate-500">Carregando...</p>
+            <p className="text-sm text-text-muted">Carregando...</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {users.map((u) => (
-                <li
-                  key={u.id}
-                  className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-sm"
-                >
-                  <div>
-                    <p className="font-medium text-slate-800">{u.name}</p>
-                    <p className="text-xs text-slate-500">{u.email}</p>
-                  </div>
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">
-                    {u.role === "admin" ? "Administrador" : "Corretor"}
-                  </span>
-                </li>
-              ))}
+              {users.map((u) =>
+                editingId === u.id ? (
+                  <EditUserRow
+                    key={u.id}
+                    user={u}
+                    busy={busyId === u.id}
+                    onCancel={() => setEditingId(null)}
+                    onSave={async (input) => {
+                      setBusyId(u.id);
+                      setRowError(null);
+                      try {
+                        await updateUser(u.id, input);
+                        setEditingId(null);
+                        await refresh();
+                      } catch (err) {
+                        setRowError(err instanceof Error ? err.message : "Falha ao editar usuário");
+                      } finally {
+                        setBusyId(null);
+                      }
+                    }}
+                  />
+                ) : (
+                  <li
+                    key={u.id}
+                    className="flex items-center justify-between rounded-lg border border-border bg-surface-raised px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-text">{u.name}</p>
+                      <p className="truncate text-xs text-text-muted">{u.email}</p>
+                    </div>
+
+                    {confirmingId === u.id ? (
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="text-xs text-text-muted">Excluir?</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(u.id)}
+                          disabled={busyId === u.id}
+                          className="text-xs font-semibold text-danger hover:text-danger/80 disabled:opacity-50"
+                        >
+                          {busyId === u.id ? "Excluindo..." : "Confirmar"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingId(null)}
+                          className="text-xs text-text-muted hover:text-text"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex shrink-0 items-center gap-3">
+                        <Badge tone={u.role === "admin" ? "accent" : "neutral"}>
+                          {u.role === "admin" ? "Administrador" : "Corretor"}
+                        </Badge>
+                        <button
+                          type="button"
+                          title="Editar"
+                          onClick={() => {
+                            setRowError(null);
+                            setEditingId(u.id);
+                          }}
+                          className="text-text-faint transition-colors hover:text-text"
+                        >
+                          <Pencil className="size-4" strokeWidth={2} />
+                        </button>
+                        <button
+                          type="button"
+                          title="Excluir"
+                          onClick={() => {
+                            setRowError(null);
+                            setConfirmingId(u.id);
+                          }}
+                          className="text-text-faint transition-colors hover:text-danger"
+                        >
+                          <Trash2 className="size-4" strokeWidth={2} />
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ),
+              )}
             </ul>
           )}
-        </div>
-      </main>
-    </div>
+        </Card>
+      </div>
+    </AppShell>
+  );
+}
+
+function EditUserRow({
+  user,
+  busy,
+  onCancel,
+  onSave,
+}: {
+  user: AdminUser;
+  busy: boolean;
+  onCancel: () => void;
+  onSave: (input: { name: string; email: string; role: "admin" | "corretor" }) => void;
+}) {
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [role, setRole] = useState<"admin" | "corretor">(user.role);
+
+  return (
+    <li className="rounded-lg border border-accent-500/40 bg-surface-raised p-4">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input value={name} onChange={(e) => setName(e.target.value)} className={`${fieldClass} flex-1`} />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className={`${fieldClass} flex-1`}
+        />
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value as "admin" | "corretor")}
+          className={fieldClass}
+        >
+          <option value="corretor">Corretor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div className="mt-3 flex justify-end gap-2">
+        <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="button" size="sm" loading={busy} onClick={() => onSave({ name, email, role })}>
+          {!busy && "Salvar"}
+        </Button>
+      </div>
+    </li>
   );
 }

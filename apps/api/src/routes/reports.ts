@@ -118,6 +118,41 @@ export async function reportRoutes(app: FastifyInstance) {
       return reply.send(withUrls);
     },
   );
+
+  app.delete<{ Params: { reportId: string } }>(
+    "/reports/:reportId",
+    { preHandler: requireAuth },
+    async (req: AuthedRequest & { params: { reportId: string } }, reply) => {
+      const { reportId } = req.params;
+
+      const { data: report, error: reportError } = await supabaseAdmin
+        .from("reports")
+        .select("id, property_id, docx_storage_path, pdf_storage_path")
+        .eq("id", reportId)
+        .single();
+      if (reportError || !report) {
+        return reply.code(404).send({ error: "Laudo não encontrado" });
+      }
+
+      if (!(await canAccessProperty(req.userId!, report.property_id))) {
+        return reply.code(403).send({ error: "Sem permissão sobre este imóvel" });
+      }
+
+      const paths = [report.docx_storage_path, report.pdf_storage_path].filter(
+        (p): p is string => !!p,
+      );
+      if (paths.length) {
+        await supabaseAdmin.storage.from("property-files").remove(paths);
+      }
+
+      const { error: deleteError } = await supabaseAdmin.from("reports").delete().eq("id", reportId);
+      if (deleteError) {
+        return reply.code(500).send({ error: deleteError.message });
+      }
+
+      return reply.send({ deleted: true });
+    },
+  );
 }
 
 async function signedUrl(path: string): Promise<string | null> {

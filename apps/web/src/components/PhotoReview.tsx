@@ -14,8 +14,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Database } from "@qea-laudofy/shared";
+import { List } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { Badge, Button } from "./ui";
 
 type Photo = Database["public"]["Tables"]["property_photos"]["Row"];
 type Category = Database["public"]["Tables"]["photo_categories"]["Row"];
@@ -152,41 +154,41 @@ export function PhotoReview({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <button
-          type="button"
-          onClick={acceptAllSuggestions}
-          disabled={pendingSuggestions.length === 0 || saving}
-          className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40"
-        >
-          Aceitar todas as sugestões ({pendingSuggestions.length})
-        </button>
-
-        <label className="flex items-center gap-2 text-xs text-slate-500">
-          Limiar de confiança para revisão prioritária:
-          <input
-            type="number"
-            min={0}
-            max={1}
-            step={0.05}
-            value={threshold}
-            onChange={(e) => setThreshold(Number(e.target.value))}
-            className="w-16 rounded border border-slate-300 px-1 py-0.5"
-          />
-        </label>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+        <h2 className="text-sm font-semibold text-text">Fotos</h2>
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="flex items-center gap-2 text-xs text-text-muted">
+            Limiar de confiança
+            <input
+              type="number"
+              min={0}
+              max={1}
+              step={0.05}
+              value={threshold}
+              onChange={(e) => setThreshold(Number(e.target.value))}
+              className="w-16 rounded-md border border-border bg-bg-inset px-2 py-1 text-text outline-none focus:border-accent-500"
+            />
+          </label>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={acceptAllSuggestions}
+            disabled={pendingSuggestions.length === 0 || saving}
+          >
+            Aceitar todas as sugestões ({pendingSuggestions.length})
+          </Button>
+        </div>
       </div>
 
-      {photos.length === 0 && (
-        <p className="text-sm text-slate-500">Nenhuma foto enviada ainda.</p>
-      )}
+      {photos.length === 0 && <p className="text-sm text-text-muted">Nenhuma foto enviada ainda.</p>}
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-7">
         {groups.map(({ key, photos: groupPhotos }) => (
           <div key={key}>
-            <h4 className="mb-2 text-sm font-semibold text-slate-700">
+            <h3 className="mb-2.5 text-[13px] font-semibold text-text">
               {key === PENDING_GROUP_KEY ? "Sem categoria / processando" : categoryLabel(key)}
-              <span className="ml-1 font-normal text-slate-400">({groupPhotos.length})</span>
-            </h4>
+              <span className="ml-1.5 font-normal text-text-faint">({groupPhotos.length})</span>
+            </h3>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -259,30 +261,30 @@ function PhotoCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`overflow-hidden rounded-lg border bg-white ${
-        lowConfidence ? "border-amber-400 ring-1 ring-amber-300" : "border-slate-200"
+      className={`overflow-hidden rounded-lg border bg-surface-raised ${
+        lowConfidence ? "border-warning/50 ring-1 ring-warning/30" : "border-border"
       }`}
     >
       <div
         {...attributes}
         {...listeners}
-        className="aspect-square cursor-grab bg-slate-100 active:cursor-grabbing"
+        className="aspect-square cursor-grab touch-none bg-bg-inset active:cursor-grabbing"
       >
         {imageUrl && (
           <img src={imageUrl} alt={photo.original_filename ?? ""} className="h-full w-full object-cover" />
         )}
       </div>
-      <div className="p-2">
-        {label && <p className="truncate text-xs font-semibold text-slate-800">{label}</p>}
+      <div className="p-2.5">
+        {label && <p className="truncate text-xs font-semibold text-text">{label}</p>}
 
         {photo.processing_status !== "concluido" ? (
-          <p className="text-xs text-slate-400">
+          <p className="mt-1 text-xs text-text-faint">
             {photo.processing_status === "erro" ? "Erro na classificação" : "Processando..."}
           </p>
         ) : (
           <>
             {customMode ? (
-              <div className="mt-1 flex gap-1">
+              <div className="mt-1.5 flex gap-1">
                 <input
                   type="text"
                   autoFocus
@@ -296,15 +298,15 @@ function PhotoCard({
                     if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   }}
                   placeholder="Nome do ambiente"
-                  className="w-full rounded border border-slate-200 px-1 py-0.5 text-xs"
+                  className="w-full rounded-md border border-border bg-bg-inset px-1.5 py-1 text-xs text-text outline-none focus:border-accent-500"
                 />
                 <button
                   type="button"
                   title="Escolher da lista"
                   onClick={() => setCustomMode(false)}
-                  className="shrink-0 rounded border border-slate-200 px-1 text-xs text-slate-500 hover:bg-slate-50"
+                  className="flex shrink-0 items-center justify-center rounded-md border border-border px-1.5 text-text-muted hover:bg-surface-hover"
                 >
-                  ☰
+                  <List className="size-3.5" strokeWidth={2} />
                 </button>
               </div>
             ) : (
@@ -318,7 +320,7 @@ function PhotoCard({
                     onChangeCategory(e.target.value);
                   }
                 }}
-                className="mt-1 w-full rounded border border-slate-200 px-1 py-0.5 text-xs"
+                className="mt-1.5 w-full rounded-md border border-border bg-bg-inset px-1.5 py-1 text-xs text-text outline-none focus:border-accent-500"
               >
                 <option value="" disabled>
                   Categoria...
@@ -332,10 +334,17 @@ function PhotoCard({
               </select>
             )}
             {photo.ai_confidence !== null && (
-              <p className={`mt-1 text-xs ${lowConfidence ? "font-semibold text-amber-600" : "text-slate-400"}`}>
-                Confiança: {Math.round(photo.ai_confidence * 100)}%
-                {lowConfidence && " · revisar"}
-              </p>
+              <div className="mt-1.5">
+                {lowConfidence ? (
+                  <Badge tone="warning" className="px-1.5 py-0.5 text-[11px]">
+                    {Math.round(photo.ai_confidence * 100)}% · revisar
+                  </Badge>
+                ) : (
+                  <p className="text-[11px] text-text-faint">
+                    Confiança: {Math.round(photo.ai_confidence * 100)}%
+                  </p>
+                )}
+              </div>
             )}
           </>
         )}

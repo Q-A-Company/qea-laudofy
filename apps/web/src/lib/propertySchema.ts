@@ -126,6 +126,10 @@ export const propertyFormSchema = z
     caracteristicasCondominio: z.record(z.string(), z.boolean()).default({}),
 
     // Step 6 - Descrição
+    // Título em destaque (negrito/maiúsculo) que abre a descrição no modelo
+    // real do laudo deles, seguido da frase fixa "O imóvel vem descrito da
+    // seguinte forma:" (não é um campo - é texto fixo aplicado na geração).
+    descricaoTitulo: optionalText,
     descricao: optionalText,
   })
   .superRefine((data, ctx) => {
@@ -271,7 +275,7 @@ export const STEP_FIELDS = {
     "condicoesObs",
   ],
   amenidades: ["caracteristicasImovel", "caracteristicasCondominio"],
-  descricao: ["descricao"],
+  descricao: ["descricaoTitulo", "descricao"],
 } as const satisfies Record<string, (keyof PropertyFormValues)[]>;
 
 export type StepKey = keyof typeof STEP_FIELDS;

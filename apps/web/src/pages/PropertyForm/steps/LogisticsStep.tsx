@@ -31,8 +31,8 @@ export function LogisticsStep() {
         {placaInstalada && <TextField name="placaNumero" label="Número da placa" />}
       </div>
 
-      <hr className="border-slate-200" />
-      <h3 className="text-sm font-semibold text-slate-900">Proprietário</h3>
+      <hr className="border-border" />
+      <h3 className="text-sm font-semibold text-text">Proprietário</h3>
       <TextField name="proprietarioNome" label="Nome" />
       <div className="grid grid-cols-2 gap-4">
         <TextField
@@ -43,7 +43,7 @@ export function LogisticsStep() {
         <TextField name="proprietarioEmail" label="E-mail" />
       </div>
 
-      <h3 className="text-sm font-semibold text-slate-900">Cônjuge (opcional)</h3>
+      <h3 className="text-sm font-semibold text-text">Cônjuge (opcional)</h3>
       <TextField name="conjugeNome" label="Nome" />
       <div className="grid grid-cols-2 gap-4">
         <PhoneField name="conjugeTelefone" label="Telefone" />
