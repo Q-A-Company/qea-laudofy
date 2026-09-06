@@ -50,7 +50,7 @@ export function Login() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg px-4">
       <div
         className="pointer-events-none absolute left-1/2 top-0 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-[0.15] blur-[120px]"
-        style={{ background: "radial-gradient(circle, #7c82f5, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, #7daff6, transparent 70%)" }}
       />
 
       <div className="relative w-full max-w-[380px]">
@@ -62,7 +62,7 @@ export function Login() {
         <div className="rounded-2xl border border-border bg-surface p-7 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]">
           <h1 className="text-[15px] font-semibold text-text">Entrar</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Acesse com o e-mail e a senha cadastrados pela sua imobiliária.
+            Acesse com o e-mail e a senha cadastrados pela Q&amp;A Company!
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>

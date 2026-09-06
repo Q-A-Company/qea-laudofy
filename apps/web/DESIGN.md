@@ -7,12 +7,13 @@
 Operator-grade dark UI inherited from the Q&A Company house style (the
 existing "Q&A Clientes" panel), extended for Q&A Laudofy's own surfaces.
 Near-black ground, raised panels distinguished by a 1px border seam (never
-a shadow), one periwinkle-indigo accent carrying every interactive and
-active state. Dense, quiet, built for a small trusted operator audience
-doing a repeated real task — not a marketing surface.
+a shadow), one sky-blue accent (`#7daff6`, the exact brand color given by
+the team) carrying every interactive and active state. Dense, quiet, built
+for a small trusted operator audience doing a repeated real task — not a
+marketing surface.
 
 Reference evidence: a screenshot of Q&A Clientes (dark/near-black,
-indigo-blue accent, sidebar-nav operator layout), supplied directly by the
+blue accent, sidebar-nav operator layout), supplied directly by the
 user as binding brand evidence. No concept-generation round was run — the
 direction was pinned by that evidence plus the explicit brief ("preto com
 azul", "padrões da empresa"), not selected from open exploration.
@@ -35,7 +36,7 @@ token below is also a generated utility, e.g. `--color-accent-500` ⇒
 | `--color-text` | `#f4f4f6` | Primary text |
 | `--color-text-muted` | `#9c9ca8` | Secondary text (7.3:1 on `--color-bg`) |
 | `--color-text-faint` | `#7d7d8c` | Placeholder/caption text (4.9:1 on `--color-bg` — contrast-checked; do not darken) |
-| `--color-accent-50…700` | `#eef0fe … #4d47bd` | Indigo-periwinkle accent scale; `500` is the primary interactive color, `300` for text-on-dark accent emphasis |
+| `--color-accent-50…700` | `#e7f0fd … #1269e2` | Sky-blue accent scale (brand color `#7daff6` = `500`, given directly by the team); same hue/saturation across steps, only lightness varies. `300` for text-on-dark accent emphasis |
 | `--color-success` / `-soft` | `#4ade9a` / 12% tint | Positive status (Ativo, confidence ok) |
 | `--color-warning` / `-soft` | `#f5a35c` / 12% tint | Attention (low-confidence photo, Vendido/Alugado status) |
 | `--color-danger` / `-soft` | `#f0685f` / 12% tint | Errors |
