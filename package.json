@@ -1,0 +1,16 @@
+{
+  "name": "qea-laudofy",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@railway/cli": "^5.49.2",
+    "supabase": "^2.116.0",
+    "vercel": "^59.11.7"
+  }
+}
